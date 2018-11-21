@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, Text, ScrollView } from 'react-native';
 import { DocumentPicker, FileSystem } from 'expo';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -8,41 +8,68 @@ class UploadScreen extends React.Component {
     static navigationOptions = {
       title: 'Select your file',
     };
-  
-    Upload = async (urlFile) => {
+
+    state =  {
+      directoryFiles : []
+    }
+
+    filesList = () => {
+      if (this.state.directoryFiles.length === 0){
+        return (
+            <Text>There's no files</Text>
+        );
+      }
+
+      return (
+        this.state.directoryFiles.map((file, i) => (
+          <FileItem key={i} file={file} deleteConfirmation={this.deleteConfirmation} navigation={this.props.navigation} />
+          ))
+        );
+    };
+
+    Upload = async (urlFile, nameFile) => {
       let file_content = await FileSystem.readAsStringAsync(urlFile);
       let split_content = file_content.split('\n');
       let array_data = split_content[2].split('\t');
       let date = array_data[0].split(' ')[0];
-      
+      let checkDirectory = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
 
-      console.log(date)
-      //let date = 
-      console.log("Upload")
-    }
-
-    confirmAlert(fileName, urlFile){
-      return Alert.alert(
-        'Confirm file to upload',
-        'File choosed: '+ fileName,
-        [
-          {text: 'Cancel', style: 'cancel'},
-          {text: 'OK', onPress: () => this.Upload(urlFile)},
-        ],
-        { cancelable: false }
-      )
+      if(checkDirectory.isDirectory){
+        let existingFile = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date);
+        if(!existingFile.exists){
+          await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date, file_content);
+          this.setState( prevState => ({
+            directoryFiles : [...prevState.directoryFiles, date]
+          }))
+          Alert.alert(
+            'Success',
+            nameFile + ' successfully uploaded',
+            [
+              {text: 'OK'},
+            ],
+          )
+        }
+      }else{
+        await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
+        await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date, file_content);
+        let test = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
+        this.setState( prevState => ({
+          directoryFiles : [...prevState.directoryFiles, date]
+        }))
+        Alert.alert(
+          'Success',
+          nameFile + ' successfully uploaded',
+          [
+            {text: 'OK'},
+          ],
+        )
+      }
     }
 
     getFile = async () => {
       try {
         let file = await DocumentPicker.getDocumentAsync(FileSystem.documentDirectory + '/Downloads');
-        if(file){
-          console.log('File choosed: ', file.name);
-          this.confirmAlert(file.name, file.uri);
-        }
-        
-        /*const content = file_content.split('\n');
-        console.log('File content: ', content[3]);*/
+        this.Upload(file.uri, file.name)
       } catch (e) {
         console.error(e);
       }
@@ -50,13 +77,11 @@ class UploadScreen extends React.Component {
 
     render() {
       const { navigate } = this.props.navigation;
-      const myButton = (
-      <Icon.Button name="file-upload" backgroundColor="#3b5998" onPress= { this.getFile/*>() =>navigate('Graph', { name: 'Graph' })*/}>
-          Upload file
-      </Icon.Button>
-      );
       return (
-        myButton
+      <ScrollView>
+        <Icon.Button name="file-upload" backgroundColor="#3b5998" onPress= { this.getFile/*>() =>navigate('Graph', { name: 'Graph' })*/}></Icon.Button>
+        {this.filesList()} 
+      </ScrollView>
       );
     }
   }
