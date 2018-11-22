@@ -35,8 +35,8 @@ class UploadScreen extends React.Component {
       let date = array_data[0].split(' ')[0];
       let uploaded_content = file_content.replace(/\s/g,';');
       let checkDirectory = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
-      var results = await Papa.parse(uploaded_content);
-      console.log(results)
+     // var results = await Papa.parse(uploaded_content);
+      //console.log(results)
       if(checkDirectory.isDirectory){
         let existingFile = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date);
         if(!existingFile.exists){
