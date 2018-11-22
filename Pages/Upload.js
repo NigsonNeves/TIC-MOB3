@@ -1,7 +1,6 @@
-const Papa = require("papaparse")
 import React from 'react';
 import { Alert, Text, ScrollView } from 'react-native';
-import { DocumentPicker, FileSystem } from 'expo';
+import { DocumentPicker, FileSystem , SQLite} from 'expo';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -23,10 +22,38 @@ class UploadScreen extends React.Component {
 
       return (
         this.state.directoryFiles.map((file, i) => (
-          <ScrollView key={i} file={file} deleteConfirmation={this.deleteConfirmation} navigation={this.props.navigation} />
+          <Text key={i} > {file} </Text>
           ))
         );
     };
+
+    deleteAlert(nameFile){
+      Alert.alert(
+        'Are you sure you want to delete this file',
+        'File name: ' + nameFile,
+        [
+          {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+          {text: 'OK', onPress: () => this.deleteFile(nameFile)},
+        ],
+      )
+    }
+
+    deleteFile = async (nameFile) => {
+      let existingFile = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + nameFile);
+
+      if(existingFile.exists){
+        await FileSystem.deleteAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + nameFile)
+      }else{
+        Alert.alert(
+          'Failed',
+          nameFile + ' doesn\'t exist',
+          [
+            {text: 'OK'},
+          ],
+        )
+      }
+
+    }
 
     Upload = async (urlFile, nameFile) => {
       let file_content = await FileSystem.readAsStringAsync(urlFile);
@@ -35,15 +62,16 @@ class UploadScreen extends React.Component {
       let date = array_data[0].split(' ')[0];
       let uploaded_content = file_content.replace(/\s/g,';');
       let checkDirectory = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
-     // var results = await Papa.parse(uploaded_content);
-      //console.log(results)
+      let test = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
+      //var results = await Papa.parse(uploaded_content);
+      console.log(test)
       if(checkDirectory.isDirectory){
         let existingFile = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date);
         if(!existingFile.exists){
           await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date, uploaded_content);
-          this.setState( prevState => ({
-            directoryFiles : [...prevState.directoryFiles, date]
-          }))
+          this.setState({
+            directoryFiles : [...this.state.directoryFiles, date]
+          })
           Alert.alert(
             'Success',
             nameFile + ' successfully uploaded',
@@ -56,9 +84,10 @@ class UploadScreen extends React.Component {
         await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
         await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date, uploaded_content);
         let test = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
-        this.setState( prevState => ({
-          directoryFiles : [...prevState.directoryFiles, date]
-        }))
+        console.log(test)
+        this.setState({
+          directoryFiles : [...this.state.directoryFiles, date]
+        })
         Alert.alert(
           'Success',
           nameFile + ' successfully uploaded',
