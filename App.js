@@ -1,10 +1,12 @@
 import {createStackNavigator} from 'react-navigation';
 import UploadScreen from './Pages/Upload.js';
 import GraphScreen from './Pages/Graph.js';
+import ArrayDataScreen from './Pages/ArrayData.js';
 
 const App = createStackNavigator({
   Upload: { screen: UploadScreen }, //Screens
   Graph: { screen: GraphScreen },
+  ArrayData: { screen: ArrayDataScreen },
   },
   {
     initialRouteName: 'Upload',
