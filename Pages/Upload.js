@@ -16,8 +16,9 @@ class UploadScreen extends React.Component {
     checkState = async () => {
       let files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
 
-       if(files){
-        if(files.length != 0){
+      //Permet d'afficher les fichier sur la page d'upload
+       if(files){ 
+        if(files.length != 0){ 
           for(let i = 0; i < files.length; i++){
             this.setState({
               directoryFiles : [...this.state.directoryFiles, files[i]]
@@ -112,6 +113,11 @@ class UploadScreen extends React.Component {
             'Success',
             nameFile + ' successfully uploaded',
           )
+        }else{
+          Alert.alert(
+            'Failed',
+            nameFile + ' already uploaded',
+          )
         }
       }else{
         await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
@@ -140,7 +146,7 @@ class UploadScreen extends React.Component {
     render() {
       return (
       <ScrollView>
-        <Icon.Button name="file-upload" backgroundColor="#3b5998" onPress= { this.getFile/*>() =>navigate('Graph', { name: 'Graph' })*/}></Icon.Button>
+        <Icon.Button name="file-upload" backgroundColor="#3b5998" onPress= { this.getFile}></Icon.Button>
         {this.filesList()}
       </ScrollView>
       );
