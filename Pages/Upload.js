@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Text, ScrollView, FlatList, StyleSheet, View } from 'react-native';
+import { Alert, Text, ScrollView} from 'react-native';
 import { DocumentPicker, FileSystem , SQLite} from 'expo';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -52,13 +52,6 @@ class UploadScreen extends React.Component {
       return (
         this.state.directoryFiles.map((file, i) => (
         <Text key={i} onPress= {() =>navigate('ArrayData', { name: 'ArrayData' })} > {file} </Text>
-        /*<View style={styles.container}>
-          <FlatList
-            data={[
-              {key: file},
-            ]}
-            renderItem={({item}) => <Text style={styles.item} onPress={this.deleteAlert(file)} >{item.key}</Text>}/>
-        </View>*/
           ))
         );
     };
@@ -100,8 +93,9 @@ class UploadScreen extends React.Component {
       let date = array_data[0].split(' ')[0];
       let uploaded_content = file_content.replace(/\s/g,';');
       let checkDirectory = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
-      let test = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
-      console.log(test)
+      const database = SQLite.openDatabase("test")
+      console.log(database)
+
       if(checkDirectory.isDirectory){
         let existingFile = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date);
         if(!existingFile.exists){
@@ -122,8 +116,7 @@ class UploadScreen extends React.Component {
       }else{
         await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
         await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + date, uploaded_content);
-        let test = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
-        console.log(test)
+
         this.setState({
           directoryFiles : [...this.state.directoryFiles, date]
         })
@@ -152,17 +145,5 @@ class UploadScreen extends React.Component {
       );
     }
   }
-
-  const styles = StyleSheet.create({
-    container: {
-     flex: 1,
-     paddingTop: 22
-    },
-    item: {
-      padding: 10,
-      fontSize: 18,
-      height: 44,
-    },
-  })
 
 export default UploadScreen;
