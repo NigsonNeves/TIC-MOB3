@@ -3,6 +3,7 @@ import { Alert, Text, ScrollView, Button} from 'react-native';
 import { DocumentPicker, FileSystem , SQLite} from 'expo';
 import { StackNavigator} from 'react-navigation';
 import { List, ListItem } from 'react-native-elements'
+import Swipeout from 'react-native-swipeout';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ArrayDataScreen from './ArrayData.js';
