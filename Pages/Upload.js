@@ -1,13 +1,20 @@
 import React from 'react';
-import { Alert, Text, ScrollView} from 'react-native';
+import { Alert, Text, ScrollView, Button} from 'react-native';
 import { DocumentPicker, FileSystem , SQLite} from 'expo';
+import { StackNavigator} from 'react-navigation';
+import { List, ListItem } from 'react-native-elements'
+
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import ArrayDataScreen from './ArrayData.js';
+import { View } from 'native-base';
+
 
 
 class UploadScreen extends React.Component {
     static navigationOptions = {
       title: 'Select your file',
     };
+
     state =  {
       directoryFiles : []
     }
@@ -16,6 +23,7 @@ class UploadScreen extends React.Component {
       let files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'meteo_uploaded_files');
 
       //Permet d'afficher les fichier sur la page d'upload
+
        if(files){ 
         if(files.length != 0){ 
           for(let i = 0; i < files.length; i++){
@@ -46,15 +54,13 @@ class UploadScreen extends React.Component {
             <Text>There's no files</Text>
         );
       }
-
       
       return (
         this.state.directoryFiles.map((file, i) => (
-        <Text key={i} onPress= {() =>navigate('ArrayData', { name: 'ArrayData' })} > {file} </Text>
+        <ListItem key={i} onPress= {() =>navigate('ArrayData', { name: 'ArrayData' , filename : file})} title={file}></ListItem>
           ))
         );
     };
-
     deleteAlert(nameFile){
       Alert.alert(
         'Are you sure you want to delete this file',
@@ -65,10 +71,8 @@ class UploadScreen extends React.Component {
         ],
       )
     }
-
     deleteFile = async (nameFile) => {
       let existingFile = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + nameFile);
-
       if(existingFile.exists){
         await FileSystem.deleteAsync(FileSystem.documentDirectory + 'meteo_uploaded_files/' + nameFile)
         this.removeItem(nameFile)
@@ -137,13 +141,23 @@ class UploadScreen extends React.Component {
 
     render() {
       return (
-      <ScrollView>
-        <Icon.Button name="file-upload" backgroundColor="#3b5998" onPress= { this.getFile}></Icon.Button>
-        {this.filesList()}
-      </ScrollView>
-      );
+        <View>
+        <ScrollView >
+          <Icon.Button style={{marginBottom: 10}}name="file-upload" backgroundColor="#3b5998" onPress= { this.getFile}></Icon.Button>
+          {this.filesList()}
+        </ScrollView>
+      </View>
 
+      );
     }
   }
 
-export default UploadScreen;
+// export default UploadScreen;
+export default StackNavigator({
+  Search :{
+    screen : UploadScreen
+  },
+  ArrayData : {
+    screen :   ArrayDataScreen
+  }
+})

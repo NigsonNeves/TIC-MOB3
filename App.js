@@ -5,12 +5,13 @@ import  {Header}  from 'react-native-elements';
 import UploadScreen from './Pages/Upload.js';
 import GraphScreen from './Pages/Graph.js';
 import ArrayDataScreen from './Pages/ArrayData.js';
+// import ListFilesScreen from './Pages/ListFiles.js';
 
 
 const Tabs = TabNavigator({
   Upload: { screen: UploadScreen }, //Screens
-  // Graph: { screen: GraphScreen },
-  ListFiles: { screen: ListFilesScreen },
+  Graph: { screen: GraphScreen },
+  // ListFiles: { screen: ListFilesScreen },
   },
   {
     tabBarPosition: "bottom",
@@ -32,15 +33,16 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={{flex:1}}>
-       <Header
+       {/* <Header
           centerComponent={{ text: 'APP Meteo', style: { color: '#fff' } }}
-        />
+        /> */}
         <StatusBar hidden={true}/>
         <Tabs/>
       </View>
     );
   }
 }
+
 
 // const App = createStackNavigator({
 //   Upload: { screen: UploadScreen }, //Screens

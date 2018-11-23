@@ -1,5 +1,9 @@
 import React from 'react';
-import { Text, ScrollView } from 'react-native';
+import { Text, ScrollView, Button } from 'react-native';
+import { StackNavigator} from 'react-navigation';
+import Graph1Screen from '../Graphs/Graph1';
+
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 class ArrayDataScreen extends React.Component {
@@ -11,10 +15,22 @@ class ArrayDataScreen extends React.Component {
       return (
         <ScrollView>
           <Text>Array Data</Text>
-          <Icon.Button name="area-chart" backgroundColor="#3b5998" onPress= { () =>navigate('Graph', { name: 'Graph' })}></Icon.Button>
+
+          <Text> File Name : {this.props.navigation.state.params.filename}</Text>
+          <Button name="area-chart" backgroundColor="#3b5998" title=" Moyenne par heure" onPress= { () =>navigate('Graph', { name: 'Graph' })}/>
+          <Button name="area-chart" backgroundColor="#3b5998" title=" Humidity (%)" onPress= { () =>navigate('Graph1', { name: 'Graph' })}/>
         </ScrollView>
       )
     }
 }
 
-export default ArrayDataScreen;
+// export default ArrayDataScreen;
+
+export default StackNavigator({
+  ArrayData :{
+    screen : ArrayDataScreen
+  },
+  Graph1 : {
+    screen :   Graph1Screen
+  }
+})
